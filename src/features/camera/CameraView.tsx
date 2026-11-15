@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { SwitchCamera } from 'lucide-react';
 import { useCamera, type FacingMode } from '../../hooks/useCamera';
+import { useTorch } from '../../hooks/useTorch';
 import type { CapturedPhoto } from '../../types/photo';
 import { captureImage } from './captureImage';
 import { CameraError } from './CameraError';
+import { TorchButton } from './TorchButton';
 
 interface CameraViewProps {
   /** Camera to open on mount (e.g. the one used before a retake). */
@@ -14,10 +16,12 @@ interface CameraViewProps {
 
 export function CameraView({ initialFacingMode, onFacingModeChange, onCapture }: CameraViewProps) {
   const { videoRef, state, retry, switchCamera } = useCamera(initialFacingMode);
+  const torch = useTorch(state.status === 'ready' ? state.track : null);
   const [isCapturing, setIsCapturing] = useState(false);
   const [captureError, setCaptureError] = useState<string | null>(null);
 
   const isReady = state.status === 'ready';
+  const notice = captureError ?? torch.error;
 
   async function handleCapture() {
     const video = videoRef.current;
@@ -57,19 +61,23 @@ export function CameraView({ initialFacingMode, onFacingModeChange, onCapture }:
         )}
         {state.status === 'error' && <CameraError error={state.error} onRetry={retry} />}
 
-        {captureError && (
+        {notice && (
           <p
             role="alert"
             className="absolute inset-x-4 top-4 rounded-lg bg-red-600/90 px-4 py-2 text-center text-sm"
           >
-            {captureError}
+            {notice}
           </p>
         )}
       </div>
 
-      {/* Controls: left slot reserved for the torch toggle (step 3) */}
       <div className="grid grid-cols-3 items-center px-6 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-        <div />
+        <TorchButton
+          supported={torch.supported}
+          on={torch.on}
+          pending={torch.pending}
+          onToggle={torch.toggle}
+        />
 
         <button
           onClick={handleCapture}
