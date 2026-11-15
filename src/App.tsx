@@ -1,5 +1,7 @@
+import { CameraView } from './features/camera/CameraView';
+
 function App() {
-  return <div className="bg-amber-200">App</div>;
+  return <CameraView />;
 }
 
 export default App;
