@@ -1,42 +1,96 @@
-import { useCamera } from '../../hooks/useCamera';
+import { useState } from 'react';
+import { SwitchCamera } from 'lucide-react';
+import { useCamera, type FacingMode } from '../../hooks/useCamera';
+import type { CapturedPhoto } from '../../types/photo';
+import { captureImage } from './captureImage';
+import { CameraError } from './CameraError';
 
-// Temporary view to verify step 1 (camera stream + errors).
-export function CameraView() {
-  const { videoRef, state, retry, switchCamera } = useCamera();
+interface CameraViewProps {
+  /** Camera to open on mount (e.g. the one used before a retake). */
+  initialFacingMode: FacingMode;
+  onFacingModeChange: (mode: FacingMode) => void;
+  onCapture: (photo: CapturedPhoto) => void;
+}
+
+export function CameraView({ initialFacingMode, onFacingModeChange, onCapture }: CameraViewProps) {
+  const { videoRef, state, retry, switchCamera } = useCamera(initialFacingMode);
+  const [isCapturing, setIsCapturing] = useState(false);
+  const [captureError, setCaptureError] = useState<string | null>(null);
+
+  const isReady = state.status === 'ready';
+
+  async function handleCapture() {
+    const video = videoRef.current;
+    if (state.status !== 'ready' || !video || isCapturing) return;
+
+    setIsCapturing(true);
+    setCaptureError(null);
+    try {
+      onCapture(await captureImage(state.track, video));
+    } catch {
+      setCaptureError('Could not capture the photo. Please try again.');
+    } finally {
+      setIsCapturing(false);
+    }
+  }
+
+  function handleSwitchCamera() {
+    onFacingModeChange(switchCamera());
+  }
 
   return (
-    <div className="relative h-full bg-black">
-      {/* Always rendered so videoRef exists before the stream arrives */}
-      <video
-        ref={videoRef}
-        autoPlay
-        playsInline
-        muted
-        className="h-full w-full object-contain"
-      />
+    <div className="flex h-full flex-col bg-black">
+      {/* Preview: object-contain so what you see is exactly what gets captured */}
+      <div className="relative min-h-0 flex-1">
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          muted
+          className="h-full w-full object-contain"
+        />
 
-      {state.status === 'starting' && (
-        <p className="absolute inset-0 grid place-items-center">Starting camera…</p>
-      )}
+        {state.status === 'starting' && (
+          <p className="absolute inset-0 grid place-items-center text-neutral-400">
+            Starting camera…
+          </p>
+        )}
+        {state.status === 'error' && <CameraError error={state.error} onRetry={retry} />}
 
-      {state.status === 'error' && (
-        <div className="absolute inset-0 grid place-content-center gap-2 p-6 text-center">
-          <p className="font-semibold">{state.error.title}</p>
-          <p className="text-sm text-neutral-400">{state.error.hint}</p>
-          <button onClick={retry} className="mx-auto rounded bg-white px-4 py-2 text-black">
-            Retry
-          </button>
-        </div>
-      )}
+        {captureError && (
+          <p
+            role="alert"
+            className="absolute inset-x-4 top-4 rounded-lg bg-red-600/90 px-4 py-2 text-center text-sm"
+          >
+            {captureError}
+          </p>
+        )}
+      </div>
 
-      {state.status === 'ready' && (
+      {/* Controls: left slot reserved for the torch toggle (step 3) */}
+      <div className="grid grid-cols-3 items-center px-6 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <div />
+
         <button
-          onClick={switchCamera}
-          className="absolute bottom-4 right-4 rounded bg-white/20 px-3 py-2"
+          onClick={handleCapture}
+          disabled={!isReady || isCapturing}
+          aria-label="Take photo"
+          className="mx-auto size-18 rounded-full border-4 border-white p-1 transition active:scale-95 disabled:opacity-40"
         >
-          Switch
+          <span
+            className={`block size-full rounded-full bg-white transition ${isCapturing ? 'scale-75 opacity-60' : ''}`}
+          />
         </button>
-      )}
+
+        <button
+          onClick={handleSwitchCamera}
+          disabled={!isReady}
+          aria-label="Switch camera"
+          className="ml-auto grid size-12 place-items-center rounded-full bg-white/15 disabled:opacity-40"
+        >
+          <SwitchCamera className="size-6" />
+        </button>
+      </div>
     </div>
   );
 }

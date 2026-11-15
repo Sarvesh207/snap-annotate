@@ -118,10 +118,13 @@ export function useCamera(initialFacing: FacingMode = 'environment') {
     setAttempt((n) => n + 1);
   }, []);
 
-  const switchCamera = useCallback(() => {
+  /** Flips front/rear camera and returns the new mode so callers can remember it. */
+  const switchCamera = useCallback((): FacingMode => {
+    const next: FacingMode = facingMode === 'environment' ? 'user' : 'environment';
     setState({ status: 'starting' });
-    setFacingMode((m) => (m === 'environment' ? 'user' : 'environment'));
-  }, []);
+    setFacingMode(next);
+    return next;
+  }, [facingMode]);
 
   return { videoRef, state, facingMode, retry, switchCamera };
 }
