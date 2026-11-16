@@ -1,4 +1,4 @@
-import { RotateCcw } from 'lucide-react';
+import { RotateCcw, SquarePen } from 'lucide-react';
 import { useQualityReport } from '../../hooks/useQualityReport';
 import type { CapturedPhoto } from '../../types/photo';
 import { QualityPanel } from '../quality/QualityPanel';
@@ -11,9 +11,10 @@ const METHOD_LABEL: Record<CapturedPhoto['method'], string> = {
 interface PhotoReviewProps {
   photo: CapturedPhoto;
   onRetake: () => void;
+  onAnnotate: () => void;
 }
 
-export function PhotoReview({ photo, onRetake }: PhotoReviewProps) {
+export function PhotoReview({ photo, onRetake, onAnnotate }: PhotoReviewProps) {
   const report = useQualityReport(photo);
 
   return (
@@ -34,7 +35,12 @@ export function PhotoReview({ photo, onRetake }: PhotoReviewProps) {
         >
           <RotateCcw className="size-5" /> Retake
         </button>
-        {/* "Annotate" button added in step 5 */}
+        <button
+          onClick={onAnnotate}
+          className="flex items-center gap-2 rounded-full bg-white px-5 py-3 font-medium text-black"
+        >
+          <SquarePen className="size-5" /> Annotate
+        </button>
       </div>
     </div>
   );
