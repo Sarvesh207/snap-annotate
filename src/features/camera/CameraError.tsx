@@ -1,4 +1,5 @@
 import { CameraOff } from 'lucide-react';
+import { Button } from '../../components/ui/Button';
 import type { CameraFailure } from './cameraErrors';
 
 interface CameraErrorProps {
@@ -16,12 +17,9 @@ export function CameraError({ error, onRetry }: CameraErrorProps) {
       <p className="text-lg font-semibold">{error.title}</p>
       <p className="max-w-sm text-sm text-neutral-400">{error.hint}</p>
       {canRetry && (
-        <button
-          onClick={onRetry}
-          className="mx-auto mt-2 rounded-full bg-white px-5 py-2 font-medium text-black"
-        >
+        <Button variant="primary" size="sm" onClick={onRetry} className="mx-auto mt-2">
           Retry
-        </button>
+        </Button>
       )}
     </div>
   );

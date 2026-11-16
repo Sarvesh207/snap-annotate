@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Trash2 } from 'lucide-react';
+import { Button } from '../../components/ui/Button';
+import { cn } from '../../lib/cn';
 import type { Annotation } from './types';
 
 interface AnnotationListProps {
@@ -36,9 +38,9 @@ export function AnnotationList({
           Annotations <span className="text-neutral-400">({annotations.length})</span>
         </h2>
         {annotations.length > 0 && (
-          <button onClick={onClear} className="text-sm text-red-300 hover:text-red-200">
+          <Button variant="danger" size="sm" onClick={onClear}>
             Clear all
-          </button>
+          </Button>
         )}
       </header>
 
@@ -55,9 +57,10 @@ export function AnnotationList({
                 key={a.id}
                 data-id={a.id}
                 onClick={() => onSelect(a.id)}
-                className={`flex items-center gap-2 rounded-xl p-2 ${
-                  selected ? 'bg-white/15 ring-1 ring-white/40' : 'bg-white/5'
-                }`}
+                className={cn(
+                  'flex items-center gap-2 rounded-xl p-2',
+                  selected ? 'bg-white/15 ring-1 ring-white/40' : 'bg-white/5',
+                )}
               >
                 <span className="size-3 shrink-0 rounded-full" style={{ background: a.color }} aria-hidden />
                 {/* text-base avoids iOS auto-zoom on focus */}
@@ -69,16 +72,17 @@ export function AnnotationList({
                   aria-label="Annotation label"
                   className="min-w-0 flex-1 rounded bg-transparent px-2 py-1 text-base outline-none focus:bg-white/10"
                 />
-                <button
+                <Button
+                  variant="ghost"
+                  size="iconSm"
                   onClick={(e) => {
                     e.stopPropagation();
                     onDelete(a.id);
                   }}
                   aria-label={`Delete ${a.label || 'annotation'}`}
-                  className="grid size-9 shrink-0 place-items-center rounded-full text-neutral-300 hover:bg-white/10"
                 >
                   <Trash2 className="size-4" />
-                </button>
+                </Button>
               </li>
             );
           })}

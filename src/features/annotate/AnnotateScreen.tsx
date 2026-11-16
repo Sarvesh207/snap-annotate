@@ -1,5 +1,6 @@
 import { useEffect, useReducer } from 'react';
 import { Camera, Download } from 'lucide-react';
+import { Button } from '../../components/ui/Button';
 import type { CapturedPhoto } from '../../types/photo';
 import { AnnotationCanvas } from './AnnotationCanvas';
 import { AnnotationList } from './AnnotationList';
@@ -45,22 +46,16 @@ export function AnnotateScreen({ photo, onNewPhoto }: AnnotateScreenProps) {
     : 'Drag on the photo to draw a box. Tap a box to select it.';
 
   return (
-    <div className="flex h-full flex-col bg-black md:flex-row">
-      <div className="flex min-h-0 flex-1 flex-col">
+    // Portrait: list as a bottom panel. Landscape (rotated phones, tablets, desktop): sidebar.
+    <div className="flex h-full flex-col bg-black landscape:flex-row">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <header className="flex items-center justify-between gap-2 px-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-2">
-          <button
-            onClick={handleNewPhoto}
-            className="flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm font-medium"
-          >
+          <Button size="sm" onClick={handleNewPhoto}>
             <Camera className="size-4" /> New photo
-          </button>
-          <button
-            onClick={handleExport}
-            disabled={items.length === 0}
-            className="flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm font-medium disabled:opacity-40"
-          >
+          </Button>
+          <Button size="sm" onClick={handleExport} disabled={items.length === 0}>
             <Download className="size-4" /> Export JSON
-          </button>
+          </Button>
         </header>
 
         <div className="min-h-0 flex-1 px-3 pb-2">
@@ -79,8 +74,7 @@ export function AnnotateScreen({ photo, onNewPhoto }: AnnotateScreenProps) {
         <p className="px-4 pb-2 text-center text-xs text-neutral-400">{hint}</p>
       </div>
 
-      {/* Bottom panel on phones, sidebar on tablets/desktop */}
-      <aside className="h-[38%] shrink-0 border-t border-white/10 pb-[env(safe-area-inset-bottom)] md:h-auto md:w-80 md:border-t-0 md:border-l">
+      <aside className="h-[38%] shrink-0 border-t border-white/10 pb-[env(safe-area-inset-bottom)] landscape:h-auto landscape:w-72 landscape:border-t-0 landscape:border-l landscape:pr-[env(safe-area-inset-right)] lg:landscape:w-80">
         <AnnotationList
           annotations={items}
           selectedId={selectedId}

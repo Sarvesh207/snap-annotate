@@ -1,10 +1,29 @@
 @import "tailwindcss";
 
+@theme {
+  /* Brief white flash over the preview when a photo is taken. */
+  --animate-shutter-flash: shutter-flash 350ms ease-out forwards;
+
+  @keyframes shutter-flash {
+    from {
+      opacity: 0.85;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+}
+
 html,
-body,
-#root {
+body {
   height: 100%;
   overscroll-behavior: none;
+}
+
+#root {
+  height: 100%;
+  /* dvh tracks the visible area as mobile browser toolbars show/hide */
+  height: 100dvh;
 }
 
 body {

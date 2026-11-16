@@ -38,7 +38,8 @@ function ReportBody({ report }: { report: QualityReport }) {
         <Icon className="size-5" aria-hidden /> {overall.title}
       </h2>
 
-      <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 text-sm sm:grid-cols-4">
+      {/* 4 columns only on wide portrait screens; the landscape side column is narrow */}
+      <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 text-sm sm:portrait:grid-cols-4">
         {report.checks.map((check) => (
           <div key={check.id}>
             <dt className="text-xs text-neutral-400">{check.label}</dt>
