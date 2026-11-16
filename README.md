@@ -3,7 +3,6 @@
 Capture high-quality photos with your device camera, check their quality, and annotate them with bounding boxes. Built with React and TypeScript, mobile-first, and works with touch, mouse and pen.
 
 **Live demo:** https://snap-annotate-tau.vercel.app
-**Demo video:** _add link_
 **Technical notes:** [docs/TECHNICAL_NOTES.md](docs/TECHNICAL_NOTES.md)
 
 > The camera only works on a secure origin (HTTPS or `localhost`). The live demo is served over HTTPS.
